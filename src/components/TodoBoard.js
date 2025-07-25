@@ -1,41 +1,18 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Column from './Column';
 import AddTodoForm from './AddTodoForm';
-import initialTodos from '../data/initialTodos';
+import { useTodo } from '../context/TodoContext';
 
 const TodoBoard = () => {
-
-  const [todos, setTodos] = useState(initialTodos);
-  const [showAddTodoForm, setShowAddTodoForm] = useState(false);
-  const [formValues, setFormValues] = useState({ title: '', description: '' });
-
-  const addTodo = (title, description) => {
-    const newTodo = { id: Date.now(), title, description, status: 'New' };
-    setTodos(prev => [...prev, newTodo]);
-    toggleForm();
-    setFormValues({ title: '', description: '' });
-  };
-
-  const moveTodo = (id, newStatus, dueDate = null) => {
-    setTodos(prev =>
-      prev.map(todo =>
-        todo.id === id ? { ...todo, status: newStatus, dueDate } : todo
-      )
-    );
-  };
-
-  const toggleForm = () => {
-    setShowAddTodoForm(prev => !prev);
-  };
-
-  const copyLastCardValues = (status) => {
-    const lastTodo = [...todos].reverse().find(todo => todo.status === status);
-    setFormValues({
-      title: lastTodo?.title || '',
-      description: lastTodo?.description || ''
-    });
-    setShowAddTodoForm(true);
-  };
+  const {
+    todos,
+    showAddTodoForm,
+    formValues,
+    addTodo,
+    moveTodo,
+    toggleForm,
+    copyLastCardValues
+  } = useTodo();
 
   return (
     <div className="flex flex-col items-center p-4 bg-gray-100 min-h-screen">

@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { FaAlignLeft, FaPaperclip, FaHashtag } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useTodo } from '../context/TodoContext';
 import {getNextStatusOptions, getStatusColor} from '../utills/statusUitls';
 
-const TodoItem = ({ todo, moveTodo }) => {
+const TodoItem = ({ todo }) => {
+  const { moveTodo } = useTodo();
   const { id, title, description, status, attachments, tags, dueDate } = todo;
   const [showMenu, setShowMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
