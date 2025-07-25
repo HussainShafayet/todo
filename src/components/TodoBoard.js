@@ -32,7 +32,7 @@ const TodoBoard = () => {
       <DndContext onDragEnd={handleDragEnd}>
       <div className="flex flex-col items-center p-4 bg-gray-100 min-h-screen">
         {showAddTodoForm && (
-          <AddTodoForm addTodo={addTodo} formValues={formValues} />
+          <AddTodoForm />
         )}
         <div className="flex flex-col md:flex-row justify-between w-full max-w-6xl">
           {['New', 'Ongoing', 'Done'].map((status) => (
