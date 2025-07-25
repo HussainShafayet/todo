@@ -4,7 +4,7 @@ import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 
 const Column = ({ title, todos }) => {
-  const { moveTodo, handleFormShow, copyLastCardValues } = useTodo();
+  const { moveTodo, toggleForm, copyLastCardValues } = useTodo();
   return (
     <div className="flex flex-col w-full md:w-1/3 p-4 border border-gray-300 rounded-lg m-2 shadow-md bg-white">
       <Header title={title} />
@@ -14,7 +14,7 @@ const Column = ({ title, todos }) => {
         ))}
       </div>
       {(title === 'New') && (
-        <Footer onAdd={() => handleFormShow()} onCopy={() => copyLastCardValues(title)} />
+        <Footer onAdd={() => toggleForm()} onCopy={() => copyLastCardValues(title)} />
       )}
     </div>
   );
