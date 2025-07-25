@@ -3,7 +3,7 @@ import { useTodo } from '../context/TodoContext';
 import { toast } from 'react-toastify';
 
 const AddTodoForm = () => {
-  const { formValues = { title: '', description: '' }, addTodo } = useTodo();
+  const { formValues = { title: '', description: '' }, addTodo, toggleForm } = useTodo();
 
   const [title, setTitle] = useState(formValues.title);
   const [description, setDescription] = useState(formValues.description);
@@ -37,6 +37,9 @@ const AddTodoForm = () => {
      
     setTitle('');
     setDescription('');
+  };
+  const handleCancel = () => {
+    toggleForm(false); 
   };
 
   return (
@@ -75,12 +78,22 @@ const AddTodoForm = () => {
         />
       </div>
 
-      <button
-        type="submit"
-        className="self-start px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
-      >
-        Add Todo
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        >
+          Add Todo
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="p-2 border rounded-lg hover:bg-gray-200 transition"
+        >
+          Cancel
+        </button>
+      </div>
     </form>
   );
 };
