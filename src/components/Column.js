@@ -13,7 +13,9 @@ const Column = ({ title, todos }) => {
           <TodoItem key={todo.id} todo={todo} moveTodo={moveTodo} />
         ))}
       </div>
-      <Footer onAdd={() => handleFormShow()} onCopy={() => copyLastCardValues(title)} />
+      {(title === 'New') && (
+        <Footer onAdd={() => handleFormShow()} onCopy={() => copyLastCardValues(title)} />
+      )}
     </div>
   );
 };
