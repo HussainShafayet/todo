@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTodo } from '../context/TodoContext';
+import { toast } from 'react-toastify';
 
 const AddTodoForm = () => {
   const { formValues = { title: '', description: '' }, addTodo } = useTodo();
@@ -32,6 +33,8 @@ const AddTodoForm = () => {
     };
 
     addTodo(newTodo);
+    toast.success('Todo added successfully!');
+     
     setTitle('');
     setDescription('');
   };

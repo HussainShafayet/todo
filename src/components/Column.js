@@ -3,9 +3,10 @@ import TodoItem from './TodoItem';
 import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core'
+import AddTodoForm from './AddTodoForm';
 
 const Column = ({ id, title, todos }) => {
-  const { moveTodo, toggleForm, copyLastCardValues } = useTodo();
+  const { moveTodo, toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
    const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div ref={setNodeRef} className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md bg-white transition-all duration-200 ${
@@ -13,6 +14,14 @@ const Column = ({ id, title, todos }) => {
       }`}>
       <Header title={title} />
       <div className="flex flex-col gap-2 mb-4">
+        {title === 'New' && (
+          <>
+            {showAddTodoForm && (
+              <AddTodoForm />
+            )}
+          </>
+        )}
+
         {todos.map(todo => (
           <TodoItem key={todo.id} todo={todo} moveTodo={moveTodo} />
         ))}

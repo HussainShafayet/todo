@@ -9,7 +9,7 @@ export const TodoProvider = ({ children }) => {
   const [formValues, setFormValues] = useState({ title: '', description: '' });
 
   const addTodo = (newTodo) => {
-    setTodos(prev => [...prev, newTodo]);
+    setTodos(prev => [newTodo, ...prev]);
     setFormValues({ title: '', description: '' });
     setShowAddTodoForm(false);
   };
