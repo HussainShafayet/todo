@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import initialTodos from '../data/initialTodos';
 
 const TodoContext = createContext();
@@ -36,17 +36,19 @@ export const TodoProvider = ({ children }) => {
     setShowAddTodoForm(true);
   };
 
+  const value = useMemo(() => ({
+    todos,
+    showAddTodoForm,
+    formValues,
+    addTodo,
+    moveTodo,
+    toggleForm,
+    copyLastCardValues,
+    setFormValues
+  }), [todos, showAddTodoForm, formValues]);
+
   return (
-    <TodoContext.Provider value={{
-      todos,
-      showAddTodoForm,
-      formValues,
-      addTodo,
-      moveTodo,
-      toggleForm,
-      copyLastCardValues,
-      setFormValues
-    }}>
+    <TodoContext.Provider value={value}>
       {children}
     </TodoContext.Provider>
   );
