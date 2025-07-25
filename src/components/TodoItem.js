@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaAlignLeft, FaPaperclip, FaHashtag, FaGripVertical } from 'react-icons/fa';
+import { FaAlignLeft, FaPaperclip, FaHashtag } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useTodo } from '../context/TodoContext';
 import { getNextStatusOptions, getStatusColor } from '../utills/statusUitls';
 import { useDraggable } from '@dnd-kit/core';
+import { motion } from 'framer-motion';
 
 const TodoItem = ({ todo }) => {
   const { moveTodo } = useTodo();
@@ -52,7 +53,11 @@ const TodoItem = ({ todo }) => {
   }, [id, moveTodo, selectedDate]);
 
   return (
-    <div
+    <motion.div
+     initial={{ opacity: 0, scale: 0.95, y: -10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
       ref={setNodeRef}
       className={`relative p-4 mb-2 border-l-4 rounded-lg bg-white shadow-md cursor-grab ${getStatusColor(status)}`}
        onContextMenu={toggleMenu}
@@ -86,7 +91,7 @@ const TodoItem = ({ todo }) => {
           onSelectStatus={handleStatusChange}
         />
       )}
-    </div>
+    </motion.div>
   );
 };
 

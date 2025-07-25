@@ -4,6 +4,7 @@ import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core'
 import AddTodoForm from './AddTodoForm';
+import { AnimatePresence } from 'framer-motion';
 
 const Column = ({ id, title, todos }) => {
   const { moveTodo, toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
@@ -22,9 +23,11 @@ const Column = ({ id, title, todos }) => {
           </>
         )}
 
-        {todos.map(todo => (
-          <TodoItem key={todo.id} todo={todo} moveTodo={moveTodo} />
+       <AnimatePresence>
+        {todos.map((todo) => (
+          <TodoItem key={todo.id} todo={todo} />
         ))}
+      </AnimatePresence>
       </div>
       {(title === 'New') && (
         <Footer onAdd={() => toggleForm()} onCopy={() => copyLastCardValues(title)} />
