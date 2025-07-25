@@ -5,6 +5,8 @@ import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core'
 import AddTodoForm from './AddTodoForm';
 import { AnimatePresence } from 'framer-motion';
+import AnimatedTodoItem from './AnimatedTodoItem';
+import { motion } from 'framer-motion';
 
 const Column = ({ id, title, todos }) => {
   const { moveTodo, toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
@@ -18,16 +20,25 @@ const Column = ({ id, title, todos }) => {
         {title === 'New' && (
           <>
             {showAddTodoForm && (
-              <AddTodoForm />
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AddTodoForm />
+              </motion.div>
             )}
+
           </>
         )}
 
-       <AnimatePresence>
+       <AnimatePresence mode="popLayout">
         {todos.map((todo) => (
-          <TodoItem key={todo.id} todo={todo} />
+          <AnimatedTodoItem key={todo.id} todo={todo} />
         ))}
       </AnimatePresence>
+
       </div>
       {(title === 'New') && (
         <Footer onAdd={() => toggleForm()} onCopy={() => copyLastCardValues(title)} />
