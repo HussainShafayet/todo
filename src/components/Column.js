@@ -2,23 +2,17 @@ import React from 'react';
 import TodoItem from './TodoItem';
 import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 
-const Column = ({ title, todos, moveTodo, handleFormShow, copyLastCardValues }) => {
-  const filteredTodos = todos.filter(todo => todo.status === title);
-
-  return (
-    <div className="flex flex-col w-full md:w-1/3 p-4 border border-gray-300 rounded-lg m-2 shadow-md bg-white">
-      <Header title={title} />
-      
-      <div className="flex flex-col gap-2 mb-4">
-        {filteredTodos.map(todo => (
-          <TodoItem key={todo.id} todo={todo} moveTodo={moveTodo} />
-        ))}
-      </div>
-
-      <Footer onAdd={() => handleFormShow()} onCopy={() => copyLastCardValues(title)} />
+const Column = ({ title, todos, moveTodo, handleFormShow, copyLastCardValues }) => (
+  <div className="flex flex-col w-full md:w-1/3 p-4 border border-gray-300 rounded-lg m-2 shadow-md bg-white">
+    <Header title={title} />
+    <div className="flex flex-col gap-2 mb-4">
+      {todos.map(todo => (
+        <TodoItem key={todo.id} todo={todo} moveTodo={moveTodo} />
+      ))}
     </div>
-  );
-};
+    <Footer onAdd={() => handleFormShow()} onCopy={() => copyLastCardValues(title)} />
+  </div>
+);
 
 const Header = ({ title }) => (
   <div className="flex justify-between items-center mb-4">
