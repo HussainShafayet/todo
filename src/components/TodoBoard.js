@@ -1,4 +1,3 @@
-// src/components/TodoBoard.jsx
 import React, { useState } from 'react';
 import Column from './Column';
 import AddTodoForm from './AddTodoForm';
@@ -10,7 +9,7 @@ const TodoBoard = () => {
     { id: 3, title: "Sales Manager Panel", description: "Description for Sales Manager Panel", status: 'New', attachments: 1, tags: 41 },
     { id: 4, title: "Customer Support & Operations", description: "Description for Customer Support & Operations", status: 'New', attachments: 0, tags: 43 },
     { id: 5, title: "Shop Panel Test Cases", description: "Description for Shop Panel Test Cases", status: 'New', attachments: 1, tags: 13 },
-    { id: 6, title: "Questions", description: "Description for Questions", status: 'Ongoing', attachments: 0, tags: 1115, dueDate: new Date(Date.now() + 86400000) },
+    { id: 6, title: "Questions", description: "Description for Questions", status: 'Ongoing', attachments: 0, tags: 1115, dueDate: new Date(Date.now() + 86400000) }
   ];
 
   const [todos, setTodos] = useState(initialTodos);
@@ -19,27 +18,29 @@ const TodoBoard = () => {
 
   const addTodo = (title, description) => {
     const newTodo = { id: Date.now(), title, description, status: 'New' };
-    setTodos([...todos, newTodo]);
-    setShowAddTodoForm(false);
+    setTodos(prev => [...prev, newTodo]);
+    toggleForm();
     setFormValues({ title: '', description: '' });
   };
 
   const moveTodo = (id, newStatus, dueDate = null) => {
-    setTodos(todos.map(todo =>
-      todo.id === id ? { ...todo, status: newStatus, dueDate } : todo
-    ));
+    setTodos(prev =>
+      prev.map(todo =>
+        todo.id === id ? { ...todo, status: newStatus, dueDate } : todo
+      )
+    );
   };
 
-  const handleFormShow = () => {
-    setShowAddTodoForm(!showAddTodoForm);
+  const toggleForm = () => {
+    setShowAddTodoForm(prev => !prev);
   };
 
   const copyLastCardValues = (status) => {
-    const lastTodo = [...todos].filter(todo => todo.status === status).pop();
-    setFormValues(lastTodo ? {
-      title: lastTodo.title,
-      description: lastTodo.description
-    } : { title: '', description: '' });
+    const lastTodo = [...todos].reverse().find(todo => todo.status === status);
+    setFormValues({
+      title: lastTodo?.title || '',
+      description: lastTodo?.description || ''
+    });
     setShowAddTodoForm(true);
   };
 
@@ -49,13 +50,13 @@ const TodoBoard = () => {
         <AddTodoForm addTodo={addTodo} formValues={formValues} />
       )}
       <div className="flex flex-col md:flex-row justify-between w-full max-w-6xl">
-        {['New', 'Ongoing', 'Done'].map((status) => (
+        {['New', 'Ongoing', 'Done'].map(status => (
           <Column
             key={status}
             title={status}
-            todos={todos}
+            todos={todos.filter(todo => todo.status === status)}
             moveTodo={moveTodo}
-            handleFormShow={handleFormShow}
+            handleFormShow={toggleForm}
             copyLastCardValues={copyLastCardValues}
           />
         ))}
