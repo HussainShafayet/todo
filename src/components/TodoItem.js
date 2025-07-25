@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaAlignLeft, FaPaperclip, FaHashtag } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -11,6 +11,7 @@ const TodoItem = ({ todo }) => {
 
   const [showMenu, setShowMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
+  const menuRef = useRef(null);
 
   useEffect(() => {
     if (status === 'Ongoing' && dueDate && new Date(dueDate) < new Date()) {
@@ -22,6 +23,23 @@ const TodoItem = ({ todo }) => {
     e.preventDefault();
     setShowMenu(prev => !prev);
   }, []);
+
+  const handleClickOutside = useCallback((e) => {
+    if (menuRef.current && !menuRef.current.contains(e.target)) {
+      setShowMenu(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu, handleClickOutside]);
 
   const handleStatusChange = useCallback((newStatus) => {
     const updatedDate = newStatus === 'Ongoing' ? selectedDate : null;
@@ -53,6 +71,7 @@ const TodoItem = ({ todo }) => {
 
       {showMenu && (
         <ContextMenu
+          ref={menuRef}
           currentStatus={status}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
@@ -63,11 +82,15 @@ const TodoItem = ({ todo }) => {
   );
 };
 
-const ContextMenu = React.memo(({ currentStatus, selectedDate, onDateChange, onSelectStatus }) => {
+
+const ContextMenu = React.forwardRef(({ currentStatus, selectedDate, onDateChange, onSelectStatus }, ref) => {
   const options = getNextStatusOptions(currentStatus);
 
   return (
-    <div className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg z-10 p-4 w-52">
+    <div
+      ref={ref}
+      className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg z-10 p-4 w-52"
+    >
       {options.includes('Ongoing') && (
         <div className="mb-4">
           <label className="block mb-1 text-sm font-semibold">Select Due Date:</label>
@@ -92,5 +115,6 @@ const ContextMenu = React.memo(({ currentStatus, selectedDate, onDateChange, onS
     </div>
   );
 });
+
 
 export default TodoItem;
