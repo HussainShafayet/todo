@@ -8,28 +8,30 @@ const AddTodoForm = () => {
   const [description, setDescription] = useState(formValues.description);
   const titleInputRef = useRef(null);
 
-  // Auto-focus on title input
+  // Auto-focus on the title input
   useEffect(() => {
     titleInputRef.current?.focus();
   }, []);
 
-  // Handle form submission
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const trimmedTitle = title.trim();
+    const trimmedDescription = description.trim();
+
+    if (!trimmedTitle || !trimmedDescription) return;
+
     const newTodo = {
-      title: title.trim(),
-      description: description.trim(),
-      status: 'New',
+      id: Date.now(),
+      title: trimmedTitle,
+      description: trimmedDescription,
+      status: 'New', // always start in New column
       attachments: 0,
       tags: '',
       dueDate: null,
-      id: Date.now()
     };
 
     addTodo(newTodo);
-
-    // Clear inputs after submit
     setTitle('');
     setDescription('');
   };
@@ -37,29 +39,42 @@ const AddTodoForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col mb-6 w-full max-w-6xl"
+      className="flex flex-col gap-3 mb-6 w-full max-w-6xl bg-white p-4 rounded-lg shadow-md"
     >
-      <input
-        type="text"
-        ref={titleInputRef}
-        placeholder="Title"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        required
-        className="mb-2 p-2 border rounded-lg"
-      />
+      <div>
+        <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+          Title
+        </label>
+        <input
+          id="title"
+          type="text"
+          ref={titleInputRef}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter task title"
+        />
+      </div>
 
-      <textarea
-        placeholder="Description"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        required
-        className="mb-2 p-2 border rounded-lg"
-      />
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+          Description
+        </label>
+        <textarea
+          id="description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter task description"
+          rows={3}
+        />
+      </div>
 
       <button
         type="submit"
-        className="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+        className="self-start px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
       >
         Add Todo
       </button>
