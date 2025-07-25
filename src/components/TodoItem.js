@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaAlignLeft, FaPaperclip, FaHashtag } from 'react-icons/fa';
+import { FaAlignLeft, FaPaperclip, FaHashtag, FaGripVertical } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useTodo } from '../context/TodoContext';
 import { getNextStatusOptions, getStatusColor } from '../utills/statusUitls';
+import { useDraggable } from '@dnd-kit/core';
 
 const TodoItem = ({ todo }) => {
   const { moveTodo } = useTodo();
@@ -12,6 +13,9 @@ const TodoItem = ({ todo }) => {
   const [showMenu, setShowMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
   const menuRef = useRef(null);
+  const { attributes, listeners, setNodeRef } = useDraggable({
+    id: todo.id,
+  });
 
   useEffect(() => {
     if (status === 'Ongoing' && dueDate && new Date(dueDate) < new Date()) {
@@ -49,18 +53,22 @@ const TodoItem = ({ todo }) => {
 
   return (
     <div
-      className={`relative p-4 mb-2 border-l-4 rounded-lg bg-white shadow-md ${getStatusColor(status)}`}
-      onContextMenu={toggleMenu}
+      ref={setNodeRef}
+      className={`relative p-4 mb-2 border-l-4 rounded-lg bg-white shadow-md cursor-grab ${getStatusColor(status)}`}
+       onContextMenu={toggleMenu}
     >
-      <h2 className="text-lg font-bold">{title}</h2>
-      <p className="text-sm text-gray-500">{description}</p>
+    <div {...listeners} {...attributes}>
+  
+        <h2 className="text-lg font-bold">{title}</h2>
+        <p className="text-sm text-gray-500">{description}</p>
 
-      <div className="flex items-center mt-2 text-gray-500 text-xs gap-2">
-        <FaAlignLeft />
-        <FaPaperclip />
-        <span>{attachments}</span>
-        <FaHashtag />
-        <span>{tags}</span>
+        <div className="flex items-center mt-2 text-gray-500 text-xs gap-2">
+          <FaAlignLeft />
+          <FaPaperclip />
+          <span>{attachments}</span>
+          <FaHashtag />
+          <span>{tags}</span>
+        </div>
       </div>
 
       {status === 'Ongoing' && dueDate && (
@@ -89,7 +97,7 @@ const ContextMenu = React.forwardRef(({ currentStatus, selectedDate, onDateChang
   return (
     <div
       ref={ref}
-      className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg z-10 p-4 w-52"
+      className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg z-10 p-4 w-52 pointer-events-auto"
     >
       {options.includes('Ongoing') && (
         <div className="mb-4">
@@ -106,7 +114,10 @@ const ContextMenu = React.forwardRef(({ currentStatus, selectedDate, onDateChang
       {options.map((option) => (
         <button
           key={option}
-          onClick={() => onSelectStatus(option)}
+          onClick={(e) => {
+              e.stopPropagation();
+              onSelectStatus(option);
+            }}
           className="block w-full text-left p-2 text-sm hover:bg-gray-100 rounded"
         >
           Move to {option}

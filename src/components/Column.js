@@ -2,11 +2,15 @@ import React from 'react';
 import TodoItem from './TodoItem';
 import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
+import { useDroppable } from '@dnd-kit/core'
 
-const Column = ({ title, todos }) => {
+const Column = ({ id, title, todos }) => {
   const { moveTodo, toggleForm, copyLastCardValues } = useTodo();
+   const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div className="flex flex-col w-full md:w-1/3 p-4 border border-gray-300 rounded-lg m-2 shadow-md bg-white">
+    <div ref={setNodeRef} className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md bg-white transition-all duration-200 ${
+        isOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+      }`}>
       <Header title={title} />
       <div className="flex flex-col gap-2 mb-4">
         {todos.map(todo => (
