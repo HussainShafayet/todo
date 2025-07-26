@@ -3,10 +3,11 @@ import Column from "./Column";
 import { useTodo } from "../context/TodoContext";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
 import TodoItem from "./TodoItem";
+import SearchBar from "./SearchBar";
 
 const TodoBoard = () => {
   const [activeTodo, setActiveTodo] = useState(null);
-  const { todos, moveTodo, copyLastCardValues } = useTodo();
+  const { todos, moveTodo,copyLastCardValues} = useTodo();
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -35,6 +36,7 @@ const TodoBoard = () => {
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
       <div className="flex flex-col items-center p-4 bg-gray-100 min-h-screen">
+        <SearchBar  />
         <div className="flex flex-col md:flex-row justify-between w-full max-w-6xl">
           {["New", "Ongoing", "Done"].map((status) => (
             <Column

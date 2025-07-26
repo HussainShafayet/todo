@@ -18,6 +18,7 @@ export const TodoProvider = ({ children }) => {
 
   const [showAddTodoForm, setShowAddTodoForm] = useState(false);
   const [formValues, setFormValues] = useState({ title: '', description: '' });
+    const [searchTerm, setSearchTerm] = useState('');
 
   // Save todos to localStorage whenever they change
   useEffect(() => {
@@ -59,8 +60,15 @@ export const TodoProvider = ({ children }) => {
     setShowAddTodoForm(true);
   };
 
+    // Filter todos based on search term (case insensitive)
+  const filteredTodos = todos.filter(todo => 
+    todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    todo.description.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const value = useMemo(() => ({
-    todos,
+    todos: filteredTodos,
+    allTodos: todos,  // raw todos list in case needed
     showAddTodoForm,
     formValues,
     addTodo,
@@ -68,8 +76,10 @@ export const TodoProvider = ({ children }) => {
     toggleForm,
     copyLastCardValues,
     setFormValues,
-    removeTodo
-  }), [todos, showAddTodoForm, formValues]);
+    removeTodo,
+     searchTerm,
+    setSearchTerm,
+  }), [filteredTodos, showAddTodoForm, formValues, searchTerm, todos]);
 
   return (
     <TodoContext.Provider value={value}>

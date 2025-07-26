@@ -33,11 +33,16 @@ const Column = ({ id, title, todos }) => {
           </>
         )}
 
-       <AnimatePresence mode="popLayout">
-        {todos.map((todo) => (
-          <AnimatedTodoItem key={todo.id} todo={todo} />
-        ))}
-      </AnimatePresence>
+       
+      {todos.length === 0 ? (
+          <p className="text-gray-400 italic text-center mt-4">No todos found.</p>
+        ) : (
+          <AnimatePresence mode="popLayout">
+            {todos.map((todo) => (
+              <AnimatedTodoItem key={todo.id} todo={todo} />
+            ))}
+          </AnimatePresence>
+        )}
 
       </div>
       {(title === 'New') && (
