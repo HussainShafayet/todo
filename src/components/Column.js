@@ -1,5 +1,5 @@
-import React from 'react';
-import { FaEllipsisH, FaCopy } from 'react-icons/fa';
+import React, {useState} from 'react';
+import { FaEllipsisH, FaCopy, FaTrash } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -7,10 +7,13 @@ import AnimatedTodoItem from './AnimatedTodoItem';
 import { AddtodoForm } from '.';
 
 const Column = ({ id: columnId, title, todos }) => {
-  const { toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
+  const { toggleForm, copyLastCardValues, showAddTodoForm, clearTodosInColumn } = useTodo();
   const { setNodeRef, isOver } = useDroppable({ id: columnId });
 
   const isNewColumn = title === 'New';
+  const [showMenu, setShowMenu] = useState(false);
+
+  const toggleMenu = () => setShowMenu((prev) => !prev);
 
   return (
     <div
@@ -21,7 +24,23 @@ const Column = ({ id: columnId, title, todos }) => {
                   transition-all duration-200
                   ${isOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-700'}`}
     >
-      <Header title={title} />
+     <Header title={title} onMenuToggle={toggleMenu} />
+
+     {showMenu && (
+  <div className="absolute right-4 top-12 z-10 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-md p-2 w-48">
+    <button
+      onClick={() => {
+        clearTodosInColumn(title); // or id, depending on how you structure it
+        setShowMenu(false);
+      }}
+      className="w-full text-left text-sm px-2 py-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 rounded flex items-center gap-2"
+    >
+      <FaTrash />
+      Clear all todos
+    </button>
+  </div>
+)}
+
 
       <div className="flex flex-col gap-2 mb-4">
         {isNewColumn && showAddTodoForm && (
@@ -51,12 +70,18 @@ const Column = ({ id: columnId, title, todos }) => {
   );
 };
 
-const Header = ({ title }) => (
-  <div className="flex justify-between items-center mb-4">
+const Header = ({ title, onMenuToggle }) => (
+  <div className="flex justify-between items-center mb-4 relative">
     <h2 className="text-lg font-bold">{title}</h2>
-    <FaEllipsisH className="text-gray-400" />
+    <button onClick={onMenuToggle} className="p-1">
+      <FaEllipsisH className="text-gray-400 hover:text-gray-600" />
+    </button>
   </div>
 );
+
+
+
+
 
 const Footer = ({ onAdd, onCopy }) => (
   <div className="flex justify-between items-center">

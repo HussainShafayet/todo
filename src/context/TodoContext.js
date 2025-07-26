@@ -51,6 +51,10 @@ export const TodoProvider = ({ children }) => {
       )
     );
   }, []);
+  const clearTodosInColumn = (status) => {
+    setTodos((prev) => prev.filter((todo) => todo.status !== status));
+  };
+
 
   const toggleForm = useCallback(() => {
     setShowAddTodoForm(prev => !prev);
@@ -85,6 +89,7 @@ export const TodoProvider = ({ children }) => {
     searchTerm,
     setSearchTerm,
     updateTodo,
+    clearTodosInColumn
   }), [
     filteredTodos,
     todos,
@@ -99,6 +104,7 @@ export const TodoProvider = ({ children }) => {
     searchTerm,
     setSearchTerm,
     updateTodo,
+    clearTodosInColumn
   ]);
 
   return (
