@@ -1,9 +1,7 @@
 import React, { useState } from "react";
-import Column from "./Column";
 import { useTodo } from "../context/TodoContext";
 import { DndContext, DragOverlay } from "@dnd-kit/core";
-import TodoItem from "./TodoItem";
-import SearchBar from "./SearchBar";
+import {SearchBar, Column, TodoItem} from ".";
 
 const TodoBoard = () => {
   const [activeTodo, setActiveTodo] = useState(null);

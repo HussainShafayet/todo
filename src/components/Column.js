@@ -2,10 +2,10 @@ import React from 'react';
 import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core'
-import AddTodoForm from './AddTodoForm';
 import { AnimatePresence } from 'framer-motion';
 import AnimatedTodoItem from './AnimatedTodoItem';
 import { motion } from 'framer-motion';
+import {AddtodoForm} from '.';
 
 const Column = ({ id, title, todos }) => {
   const { toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
@@ -27,7 +27,7 @@ const Column = ({ id, title, todos }) => {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.3 }}
               >
-                <AddTodoForm />
+                <AddtodoForm />
               </motion.div>
             )}
 
