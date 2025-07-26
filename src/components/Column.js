@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { FaEllipsisH, FaCopy, FaTrash } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core';
@@ -7,9 +7,14 @@ import AnimatedTodoItem from './AnimatedTodoItem';
 import { AddtodoForm } from '.';
 
 const Column = ({ id: columnId, title, todos }) => {
-  const { toggleForm, copyLastCardValues, showAddTodoForm, clearTodosInColumn } = useTodo();
-  const { setNodeRef, isOver } = useDroppable({ id: columnId });
+  const {
+    toggleForm,
+    copyLastCardValues,
+    showAddTodoForm,
+    clearTodosInColumn,
+  } = useTodo();
 
+  const { setNodeRef, isOver } = useDroppable({ id: columnId });
   const isNewColumn = title === 'New';
   const [showMenu, setShowMenu] = useState(false);
 
@@ -18,31 +23,33 @@ const Column = ({ id: columnId, title, todos }) => {
   return (
     <div
       ref={setNodeRef}
-      className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md
-                  bg-white dark:bg-gray-800 
-                  text-gray-900 dark:text-gray-100 
-                  transition-all duration-200
-                  ${isOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-700'}`}
+      className={`relative flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md
+        bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+        transition-all duration-200
+        ${isOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-700'}`}
     >
-     <Header title={title} onMenuToggle={toggleMenu} />
+      <Header title={title} onMenuToggle={toggleMenu} />
 
-     {showMenu && (
-  <div className="absolute right-4 top-12 z-10 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-md p-2 w-48">
-    <button
-      onClick={() => {
-        clearTodosInColumn(title); // or id, depending on how you structure it
-        setShowMenu(false);
-      }}
-      className="w-full text-left text-sm px-2 py-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 rounded flex items-center gap-2"
-    >
-      <FaTrash />
-      Clear all todos
-    </button>
-  </div>
-)}
+      {/* Dropdown menu */}
+      {showMenu && (
+        <div className="absolute right-4 top-12 z-10 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-md shadow-md p-2 w-48">
+          <button
+            onClick={() => {
+              clearTodosInColumn(title);
+              setShowMenu(false);
+            }}
+            className="w-full text-left text-sm px-2 py-1 text-red-600 hover:bg-red-100 dark:hover:bg-red-800 rounded flex items-center gap-2"
+          >
+            <FaTrash />
+            Clear all todos
+          </button>
+        </div>
+      )}
 
-
-      <div className="flex flex-col gap-2 mb-4">
+      {/* Todo list container */}
+      <div className="flex flex-col gap-2 mb-4 overflow-y-auto"  style={{
+    maxHeight: 'calc(90vh - 150px)'
+  }}>
         {isNewColumn && showAddTodoForm && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -65,7 +72,13 @@ const Column = ({ id: columnId, title, todos }) => {
         )}
       </div>
 
-      {isNewColumn && <Footer onAdd={toggleForm} onCopy={() => copyLastCardValues(title)} />}
+      {/* Footer controls */}
+      {isNewColumn && (
+        <Footer
+          onAdd={toggleForm}
+          onCopy={() => copyLastCardValues(title)}
+        />
+      )}
     </div>
   );
 };
@@ -78,10 +91,6 @@ const Header = ({ title, onMenuToggle }) => (
     </button>
   </div>
 );
-
-
-
-
 
 const Footer = ({ onAdd, onCopy }) => (
   <div className="flex justify-between items-center">
