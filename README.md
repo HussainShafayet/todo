@@ -9,7 +9,7 @@ A modern, responsive Todo app built with React, featuring drag-and-drop, theming
 
 ## 🚀 Live Demo
 
-Try it now: [https://my-todo-app.vercel.app](https://my-todo-app.vercel.app)
+Try it now: [https://todo-app-91.netlify.app/](https://todo-app-91.netlify.app/)
 
 ---
 
