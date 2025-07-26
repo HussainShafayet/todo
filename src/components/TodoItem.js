@@ -1,19 +1,22 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaAlignLeft, FaPaperclip, FaHashtag } from 'react-icons/fa';
+import { FaAlignLeft, FaPaperclip, FaHashtag, FaTrash } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useTodo } from '../context/TodoContext';
 import { getNextStatusOptions, getStatusColor } from '../utills/statusUitls';
 import { useDraggable } from '@dnd-kit/core';
 import { motion } from 'framer-motion';
+import ConfirmModal from './ConfirmModal';
 
 const TodoItem = ({ todo }) => {
-  const { moveTodo } = useTodo();
+  const { moveTodo, removeTodo } = useTodo();
   const { id, title, description, status, attachments, tags, dueDate } = todo;
 
   const [showMenu, setShowMenu] = useState(false);
   const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
   const menuRef = useRef(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: todo.id,
   });
@@ -51,6 +54,16 @@ const TodoItem = ({ todo }) => {
     moveTodo(id, newStatus, updatedDate);
     setShowMenu(false);
   }, [id, moveTodo, selectedDate]);
+
+   
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  const handleConfirmDelete = () => {
+    removeTodo(todo.id);
+    closeModal();
+  };
 
   return (
     <motion.div
@@ -91,6 +104,24 @@ const TodoItem = ({ todo }) => {
           onSelectStatus={handleStatusChange}
         />
       )}
+
+        <button
+        onClick={openModal}
+        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+        aria-label={`Delete todo: ${todo.title}`}
+        title={`Delete "${todo.title}"`}
+        type="button"
+      >
+        <FaTrash />
+      </button>
+
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete "${todo.title}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={closeModal}
+      />
     </motion.div>
   );
 };

@@ -33,6 +33,10 @@ export const TodoProvider = ({ children }) => {
     setFormValues({ title: '', description: '' });
     setShowAddTodoForm(false);
   };
+  const removeTodo = (id) => {
+  setTodos(prev => prev.filter(todo => todo.id !== id));
+};
+
 
   const moveTodo = (id, newStatus, dueDate = null) => {
     setTodos(prev =>
@@ -63,7 +67,8 @@ export const TodoProvider = ({ children }) => {
     moveTodo,
     toggleForm,
     copyLastCardValues,
-    setFormValues
+    setFormValues,
+    removeTodo
   }), [todos, showAddTodoForm, formValues]);
 
   return (
