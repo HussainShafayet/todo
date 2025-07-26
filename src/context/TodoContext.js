@@ -1,12 +1,11 @@
-import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
+import React, { createContext, useContext, useState, useMemo, useEffect, useCallback } from 'react';
 import initialTodos from '../data/initialTodos';
 
 const TodoContext = createContext();
 
 const LOCAL_STORAGE_KEY = 'myapp_todos';
-
 export const TodoProvider = ({ children }) => {
-  // Load todos from localStorage if available, otherwise use initialTodos
+    // Load todos from localStorage if available, otherwise use initialTodos
   const [todos, setTodos] = useState(() => {
     try {
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -29,52 +28,52 @@ export const TodoProvider = ({ children }) => {
     }
   }, [todos]);
 
-  const addTodo = (newTodo) => {
+  const addTodo = useCallback((newTodo) => {
     setTodos(prev => [newTodo, ...prev]);
     setFormValues({ title: '', description: '' });
     setShowAddTodoForm(false);
-  };
-  const updateTodo = (id, updatedFields) => {
-  setTodos((prev) =>
-    prev.map((todo) => (todo.id === id ? { ...todo, ...updatedFields } : todo))
-  );
-};
+  }, []);
 
-  const removeTodo = (id) => {
-  setTodos(prev => prev.filter(todo => todo.id !== id));
-};
+  const updateTodo = useCallback((id, updatedFields) => {
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === id ? { ...todo, ...updatedFields } : todo))
+    );
+  }, []);
 
+  const removeTodo = useCallback((id) => {
+    setTodos(prev => prev.filter(todo => todo.id !== id));
+  }, []);
 
-  const moveTodo = (id, newStatus, dueDate = null) => {
+  const moveTodo = useCallback((id, newStatus, dueDate = null) => {
     setTodos(prev =>
       prev.map(todo =>
         todo.id === id ? { ...todo, status: newStatus, dueDate } : todo
       )
     );
-  };
+  }, []);
 
-  const toggleForm = () => {
+  const toggleForm = useCallback(() => {
     setShowAddTodoForm(prev => !prev);
-  };
+  }, []);
 
-  const copyLastCardValues = (status) => {
+  const copyLastCardValues = useCallback((status) => {
     const lastTodo = [...todos].reverse().find(todo => todo.status === status);
     setFormValues({
       title: lastTodo?.title || '',
       description: lastTodo?.description || ''
     });
     setShowAddTodoForm(true);
-  };
+  }, [todos]);
 
-    // Filter todos based on search term (case insensitive)
-  const filteredTodos = todos.filter(todo => 
+  // filteredTodos remains the same
+   const filteredTodos = todos.filter(todo => 
     todo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     todo.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const value = useMemo(() => ({
     todos: filteredTodos,
-    allTodos: todos,  // raw todos list in case needed
+    allTodos: todos,
     showAddTodoForm,
     formValues,
     addTodo,
@@ -83,10 +82,24 @@ export const TodoProvider = ({ children }) => {
     copyLastCardValues,
     setFormValues,
     removeTodo,
-     searchTerm,
+    searchTerm,
     setSearchTerm,
     updateTodo,
-  }), [filteredTodos, showAddTodoForm, formValues, searchTerm, todos]);
+  }), [
+    filteredTodos,
+    todos,
+    showAddTodoForm,
+    formValues,
+    addTodo,
+    moveTodo,
+    toggleForm,
+    copyLastCardValues,
+    setFormValues,
+    removeTodo,
+    searchTerm,
+    setSearchTerm,
+    updateTodo,
+  ]);
 
   return (
     <TodoContext.Provider value={value}>

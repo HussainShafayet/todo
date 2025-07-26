@@ -1,5 +1,4 @@
 import React from 'react';
-import TodoItem from './TodoItem';
 import { FaEllipsisH, FaCopy } from 'react-icons/fa';
 import { useTodo } from '../context/TodoContext';
 import { useDroppable } from '@dnd-kit/core'
@@ -9,7 +8,7 @@ import AnimatedTodoItem from './AnimatedTodoItem';
 import { motion } from 'framer-motion';
 
 const Column = ({ id, title, todos }) => {
-  const { moveTodo, toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
+  const { toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
    const { setNodeRef, isOver } = useDroppable({ id });
   return (
     <div ref={setNodeRef} className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md
