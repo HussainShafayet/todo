@@ -15,8 +15,6 @@ Try it now: [https://todo-app-91.netlify.app/](https://todo-app-91.netlify.app/)
 
 ## 📸 Screenshots
 
-*Add screenshots in the `docs/screenshots` folder and update these paths accordingly.*
-
 ![Screenshot 1](docs/screenshots/screenshot1.png)  
 ![Screenshot 2](docs/screenshots/screenshot2.png)
 
