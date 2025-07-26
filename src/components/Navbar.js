@@ -7,20 +7,26 @@ const Navbar = () => {
 
   return (
     <nav
-      className="bg-blue-600 dark:bg-gray-900 text-white px-6 py-4 shadow-md flex justify-between items-center"
+      className="bg-blue-600 dark:bg-gray-900 text-white px-6 py-4 shadow-md"
       role="navigation"
-      aria-label="Main navigation"
+      aria-label="Main Navigation"
     >
-      <h1 className="text-xl font-bold tracking-wide">📝 Todo App</h1>
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        {/* Logo/Title */}
+        <h1 className="text-xl sm:text-2xl font-bold tracking-wide">
+          📝 Todo App
+        </h1>
 
-      <button
-        onClick={toggleTheme}
-        className="text-xl p-2 rounded hover:bg-blue-500 dark:hover:bg-gray-700 transition-colors duration-200"
-        aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-        title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
-      >
-        {theme === 'dark' ? <FaSun /> : <FaMoon />}
-      </button>
+        {/* Theme Toggle Button */}
+        <button
+          onClick={toggleTheme}
+          className="text-xl p-2 rounded-full hover:bg-blue-500 dark:hover:bg-gray-700 transition-colors duration-200"
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`}
+        >
+          {theme === 'dark' ? <FaSun /> : <FaMoon />}
+        </button>
+      </div>
     </nav>
   );
 };
