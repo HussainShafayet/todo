@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -8,18 +8,18 @@ const ConfirmModal = ({
   onCancel = () => {},
   message = 'Are you sure?',
 }) => {
+  const handleEsc = useCallback((e) => {
+    if (e.key === 'Escape') {
+      onCancel();
+    }
+  }, [onCancel]);
+
   useEffect(() => {
-    if (!isOpen) return;
-
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') {
-        onCancel();
-      }
-    };
-
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [isOpen, onCancel]);
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+      return () => document.removeEventListener('keydown', handleEsc);
+    }
+  }, [isOpen, handleEsc]);
 
   if (!isOpen) return null;
 
@@ -39,29 +39,31 @@ const ConfirmModal = ({
       >
         <motion.div
           className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-sm w-full shadow-xl text-gray-900 dark:text-gray-100"
-          initial={{ scale: 0.9, opacity: 0 }}
+          initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.9, opacity: 0 }}
+          exit={{ scale: 0.95, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
           tabIndex={-1}
         >
-          <h2 id="confirm-dialog-title" className="text-lg font-bold mb-4">
+          <h2 id="confirm-dialog-title" className="text-lg font-semibold mb-3">
             Confirm
           </h2>
-          <p id="confirm-dialog-description" className="mb-6">
+          <p id="confirm-dialog-description" className="mb-6 text-sm">
             {message}
           </p>
-          <div className="flex justify-end gap-4">
+          <div className="flex justify-end gap-3">
             <button
+              type="button"
               onClick={onCancel}
-              className="px-4 py-2 rounded bg-gray-300 hover:bg-gray-400 dark:bg-gray-600 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-gray-500"
-              aria-label="Cancel deletion"
+              className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              aria-label="Cancel action"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={onConfirm}
-              className="px-4 py-2 rounded bg-red-500 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-600"
+              className="px-4 py-2 rounded bg-red-500 hover:bg-red-600 text-white focus:outline-none focus:ring-2 focus:ring-red-600"
               aria-label="Confirm deletion"
             >
               Delete
