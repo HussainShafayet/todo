@@ -7,7 +7,7 @@ import SearchBar from "./SearchBar";
 
 const TodoBoard = () => {
   const [activeTodo, setActiveTodo] = useState(null);
-  const { todos, moveTodo,copyLastCardValues} = useTodo();
+  const { todos, moveTodo, copyLastCardValues } = useTodo();
 
   const handleDragStart = (event) => {
     const { active } = event;
@@ -35,8 +35,13 @@ const TodoBoard = () => {
 
   return (
     <DndContext onDragEnd={handleDragEnd} onDragStart={handleDragStart}>
-      <div className="flex flex-col items-center p-4 bg-gray-100 min-h-screen">
-        <SearchBar  />
+      <div className="flex flex-col items-center p-4 min-h-screen 
+                      bg-gray-100 text-gray-900 
+                      dark:bg-gray-900 dark:text-white 
+                      transition-colors duration-300">
+        
+        <SearchBar />
+
         <div className="flex flex-col md:flex-row justify-between w-full max-w-6xl">
           {["New", "Ongoing", "Done"].map((status) => (
             <Column

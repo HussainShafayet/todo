@@ -17,9 +17,7 @@ const TodoItem = ({ todo }) => {
   const menuRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { attributes, listeners, setNodeRef } = useDraggable({
-    id: todo.id,
-  });
+  const { attributes, listeners, setNodeRef } = useDraggable({ id: todo.id });
 
   useEffect(() => {
     if (status === 'Ongoing' && dueDate && new Date(dueDate) < new Date()) {
@@ -29,7 +27,7 @@ const TodoItem = ({ todo }) => {
 
   const toggleMenu = useCallback((e) => {
     e.preventDefault();
-    setShowMenu(prev => !prev);
+    setShowMenu((prev) => !prev);
   }, []);
 
   const handleClickOutside = useCallback((e) => {
@@ -41,21 +39,20 @@ const TodoItem = ({ todo }) => {
   useEffect(() => {
     if (showMenu) {
       document.addEventListener('mousedown', handleClickOutside);
-    } else {
-      document.removeEventListener('mousedown', handleClickOutside);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showMenu, handleClickOutside]);
 
-  const handleStatusChange = useCallback((newStatus) => {
-    const updatedDate = newStatus === 'Ongoing' ? selectedDate : null;
-    moveTodo(id, newStatus, updatedDate);
-    setShowMenu(false);
-  }, [id, moveTodo, selectedDate]);
-
-   
+  const handleStatusChange = useCallback(
+    (newStatus) => {
+      const updatedDate = newStatus === 'Ongoing' ? selectedDate : null;
+      moveTodo(id, newStatus, updatedDate);
+      setShowMenu(false);
+    },
+    [id, moveTodo, selectedDate]
+  );
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -67,20 +64,22 @@ const TodoItem = ({ todo }) => {
 
   return (
     <motion.div
-     initial={{ opacity: 0, scale: 0.95, y: -10 }}
+      initial={{ opacity: 0, scale: 0.95, y: -10 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.3 }}
       ref={setNodeRef}
-      className={`relative p-4 mb-2 border-l-4 rounded-lg bg-white shadow-md cursor-grab ${getStatusColor(status)}`}
-       onContextMenu={toggleMenu}
+      onContextMenu={toggleMenu}
+      className={`relative p-4 mb-2 border-l-4 rounded-lg shadow-md cursor-grab transition-colors duration-300
+        bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
+        ${getStatusColor(status)}
+      `}
     >
-    <div {...listeners} {...attributes}>
-  
+      <div {...listeners} {...attributes}>
         <h2 className="text-lg font-bold">{title}</h2>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-300">{description}</p>
 
-        <div className="flex items-center mt-2 text-gray-500 text-xs gap-2">
+        <div className="flex items-center mt-2 text-gray-500 dark:text-gray-400 text-xs gap-2">
           <FaAlignLeft />
           <FaPaperclip />
           <span>{attachments}</span>
@@ -105,7 +104,7 @@ const TodoItem = ({ todo }) => {
         />
       )}
 
-        <button
+      <button
         onClick={openModal}
         className="absolute top-2 right-2 text-red-500 hover:text-red-700"
         aria-label={`Delete todo: ${todo.title}`}
@@ -126,42 +125,44 @@ const TodoItem = ({ todo }) => {
   );
 };
 
+const ContextMenu = React.forwardRef(
+  ({ currentStatus, selectedDate, onDateChange, onSelectStatus }, ref) => {
+    const options = getNextStatusOptions(currentStatus);
 
-const ContextMenu = React.forwardRef(({ currentStatus, selectedDate, onDateChange, onSelectStatus }, ref) => {
-  const options = getNextStatusOptions(currentStatus);
+    return (
+      <div
+        ref={ref}
+        className="absolute top-10 left-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 
+        text-gray-800 dark:text-gray-100 rounded-lg shadow-lg z-10 p-4 w-52 transition-colors duration-300"
+      >
+        {options.includes('Ongoing') && (
+          <div className="mb-4">
+            <label className="block mb-1 text-sm font-semibold dark:text-white">Select Due Date:</label>
+            <DatePicker
+              selected={selectedDate}
+              onChange={onDateChange}
+              className="w-full p-2 border rounded text-sm bg-white dark:bg-gray-800 dark:border-gray-600 dark:text-white"
+              dateFormat="MM/dd/yyyy"
+            />
+          </div>
+        )}
 
-  return (
-    <div
-      ref={ref}
-      className="absolute top-10 left-0 bg-white border rounded-lg shadow-lg z-10 p-4 w-52 pointer-events-auto"
-    >
-      {options.includes('Ongoing') && (
-        <div className="mb-4">
-          <label className="block mb-1 text-sm font-semibold">Select Due Date:</label>
-          <DatePicker
-            selected={selectedDate}
-            onChange={onDateChange}
-            className="w-full p-2 border rounded text-sm"
-            dateFormat="MM/dd/yyyy"
-          />
-        </div>
-      )}
-
-      {options.map((option) => (
-        <button
-          key={option}
-          onClick={(e) => {
+        {options.map((option) => (
+          <button
+            key={option}
+            onClick={(e) => {
               e.stopPropagation();
               onSelectStatus(option);
             }}
-          className="block w-full text-left p-2 text-sm hover:bg-gray-100 rounded"
-        >
-          Move to {option}
-        </button>
-      ))}
-    </div>
-  );
-});
-
+            className="block w-full text-left p-2 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-600"
+          >
+            Move to {option}
+          </button>
+        ))}
+      </div>
+    );
+  }
+);
 
 export default TodoItem;
+

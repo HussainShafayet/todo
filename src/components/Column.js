@@ -12,9 +12,11 @@ const Column = ({ id, title, todos }) => {
   const { moveTodo, toggleForm, copyLastCardValues, showAddTodoForm } = useTodo();
    const { setNodeRef, isOver } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md bg-white transition-all duration-200 ${
-        isOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
-      }`}>
+    <div ref={setNodeRef} className={`flex flex-col w-full md:w-1/3 p-4 border rounded-lg m-2 shadow-md
+              bg-white dark:bg-gray-800 
+              text-gray-900 dark:text-gray-100 
+              transition-all duration-200
+              ${isOver ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-700'}`}>
       <Header title={title} />
       <div className="flex flex-col gap-2 mb-4">
         {title === 'New' && (
