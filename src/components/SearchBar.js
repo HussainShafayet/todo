@@ -1,8 +1,24 @@
-import React from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTodo } from '../context/TodoContext';
+import debounce from 'lodash/debounce';
 
 const SearchBar = () => {
-  const { searchTerm, setSearchTerm } = useTodo();
+  const { setSearchTerm } = useTodo();
+  const [inputValue, setInputValue] = useState('');
+
+  // Debounced function
+  const debouncedSetSearch = useCallback(
+    debounce((value) => {
+      setSearchTerm(value);
+    }, 300),
+    [] // stable instance
+  );
+
+  useEffect(() => {
+    debouncedSetSearch(inputValue);
+    // Cleanup on unmount
+    return () => debouncedSetSearch.cancel();
+  }, [inputValue, debouncedSetSearch]);
 
   return (
     <div className="w-full max-w-6xl mb-4">
@@ -13,8 +29,8 @@ const SearchBar = () => {
         id="search-todos"
         type="search"
         placeholder="Search todos..."
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
         className="w-full p-2 border rounded-lg 
                    bg-white text-gray-900 placeholder-gray-400 
                    dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-500 
