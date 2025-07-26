@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTodo } from '../context/TodoContext';
 import debounce from 'lodash/debounce';
 
@@ -6,19 +6,17 @@ const SearchBar = () => {
   const { setSearchTerm } = useTodo();
   const [inputValue, setInputValue] = useState('');
 
-  // Debounced function
-  const debouncedSetSearch = useCallback(
-    debounce((value) => {
-      setSearchTerm(value);
-    }, 300),
-    [] // stable instance
-  );
-
   useEffect(() => {
+    const debouncedSetSearch = debounce((value) => {
+      setSearchTerm(value);
+    }, 300);
+
     debouncedSetSearch(inputValue);
-    // Cleanup on unmount
-    return () => debouncedSetSearch.cancel();
-  }, [inputValue, debouncedSetSearch]);
+
+    return () => {
+      debouncedSetSearch.cancel();
+    };
+  }, [inputValue, setSearchTerm]);
 
   return (
     <div className="w-full max-w-6xl mb-4">
