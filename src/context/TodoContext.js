@@ -34,6 +34,12 @@ export const TodoProvider = ({ children }) => {
     setFormValues({ title: '', description: '' });
     setShowAddTodoForm(false);
   };
+  const updateTodo = (id, updatedFields) => {
+  setTodos((prev) =>
+    prev.map((todo) => (todo.id === id ? { ...todo, ...updatedFields } : todo))
+  );
+};
+
   const removeTodo = (id) => {
   setTodos(prev => prev.filter(todo => todo.id !== id));
 };
@@ -79,6 +85,7 @@ export const TodoProvider = ({ children }) => {
     removeTodo,
      searchTerm,
     setSearchTerm,
+    updateTodo,
   }), [filteredTodos, showAddTodoForm, formValues, searchTerm, todos]);
 
   return (

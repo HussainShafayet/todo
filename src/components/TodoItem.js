@@ -1,26 +1,35 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { FaAlignLeft, FaPaperclip, FaHashtag, FaTrash } from 'react-icons/fa';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
-import { useTodo } from '../context/TodoContext';
-import { getNextStatusOptions, getStatusColor } from '../utills/statusUitls';
-import { useDraggable } from '@dnd-kit/core';
-import { motion } from 'framer-motion';
-import ConfirmModal from './ConfirmModal';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { FaAlignLeft, FaPaperclip, FaHashtag, FaTrash } from "react-icons/fa";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useTodo } from "../context/TodoContext";
+import { getNextStatusOptions, getStatusColor } from "../utills/statusUitls";
+import { useDraggable } from "@dnd-kit/core";
+import { motion } from "framer-motion";
+import ConfirmModal from "./ConfirmModal";
+import { useTheme } from "../context/ThemeContext";
 
 const TodoItem = ({ todo }) => {
-  const { moveTodo, removeTodo } = useTodo();
+  const { moveTodo, removeTodo, updateTodo } = useTodo();
+  const { theme } = useTheme();
   const { id, title, description, status, attachments, tags, dueDate } = todo;
 
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
+  const [selectedDate, setSelectedDate] = useState(
+    dueDate ? new Date(dueDate) : new Date()
+  );
   const menuRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // State for editing
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState(todo.title);
+  const [editDescription, setEditDescription] = useState(todo.description);
 
   const { attributes, listeners, setNodeRef } = useDraggable({ id: todo.id });
 
   useEffect(() => {
-    if (status === 'Ongoing' && dueDate && new Date(dueDate) < new Date()) {
+    if (status === "Ongoing" && dueDate && new Date(dueDate) < new Date()) {
       alert(`⚠️ Task "${title}" is overdue!`);
     }
   }, [status, dueDate, title]);
@@ -38,16 +47,16 @@ const TodoItem = ({ todo }) => {
 
   useEffect(() => {
     if (showMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showMenu, handleClickOutside]);
 
   const handleStatusChange = useCallback(
     (newStatus) => {
-      const updatedDate = newStatus === 'Ongoing' ? selectedDate : null;
+      const updatedDate = newStatus === "Ongoing" ? selectedDate : null;
       moveTodo(id, newStatus, updatedDate);
       setShowMenu(false);
     },
@@ -75,23 +84,83 @@ const TodoItem = ({ todo }) => {
         ${getStatusColor(status)}
       `}
     >
-      <div {...listeners} {...attributes}>
-        <h2 className="text-lg font-bold">{title}</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-300">{description}</p>
+      {isEditing ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateTodo(todo.id, {
+              title: editTitle,
+              description: editDescription,
+            });
+            setIsEditing(false);
+          }}
+          className={`flex flex-col gap-2 p-2 rounded ${
+            theme === "dark" ? "bg-gray-800" : "bg-white"
+          }`}
+        >
+          <input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            required
+            className={`w-full p-2 rounded border focus:outline-none focus:ring-2 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500"
+                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-400"
+            }`}
+            placeholder="Edit title"
+          />
+          <textarea
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            className={`w-full p-2 rounded border mt-1 resize-none focus:outline-none focus:ring-2 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500"
+                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-400"
+            }`}
+            placeholder="Edit description"
+            rows={3}
+          />
+          <div className="flex gap-2 justify-end">
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className={`px-4 py-2 rounded border ${
+                theme === "dark"
+                  ? "border-gray-500 text-gray-300 hover:bg-gray-700"
+                  : "border-gray-300 text-gray-700 hover:bg-gray-200"
+              } transition`}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div {...listeners} {...attributes}>
+          <h2 className="text-lg font-bold">{title}</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-300">
+            {description}
+          </p>
 
-        <div className="flex items-center mt-2 text-gray-500 dark:text-gray-400 text-xs gap-2">
-          <FaAlignLeft />
-          <FaPaperclip />
-          <span>{attachments}</span>
-          <FaHashtag />
-          <span>{tags}</span>
+          <div className="flex items-center mt-2 text-gray-500 dark:text-gray-400 text-xs gap-2">
+            <FaAlignLeft />
+            <FaPaperclip />
+            <span>{attachments}</span>
+            <FaHashtag />
+            <span>{tags}</span>
+          </div>
+
+          {status === "Ongoing" && dueDate && (
+            <p className="text-xs text-red-500 mt-1">
+              Due by: {new Date(dueDate).toLocaleDateString()}
+            </p>
+          )}
         </div>
-      </div>
-
-      {status === 'Ongoing' && dueDate && (
-        <p className="text-xs text-red-500 mt-1">
-          Due by: {new Date(dueDate).toLocaleDateString()}
-        </p>
       )}
 
       {showMenu && (
@@ -121,6 +190,14 @@ const TodoItem = ({ todo }) => {
         onConfirm={handleConfirmDelete}
         onCancel={closeModal}
       />
+
+      <button
+        onClick={() => setIsEditing(true)}
+        className="text-blue-500 hover:text-blue-700"
+        aria-label={`Edit todo: ${todo.title}`}
+      >
+        ✏️
+      </button>
     </motion.div>
   );
 };
@@ -135,9 +212,11 @@ const ContextMenu = React.forwardRef(
         className="absolute top-10 left-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 
         text-gray-800 dark:text-gray-100 rounded-lg shadow-lg z-10 p-4 w-52 transition-colors duration-300"
       >
-        {options.includes('Ongoing') && (
+        {options.includes("Ongoing") && (
           <div className="mb-4">
-            <label className="block mb-1 text-sm font-semibold dark:text-white">Select Due Date:</label>
+            <label className="block mb-1 text-sm font-semibold dark:text-white">
+              Select Due Date:
+            </label>
             <DatePicker
               selected={selectedDate}
               onChange={onDateChange}
@@ -165,4 +244,3 @@ const ContextMenu = React.forwardRef(
 );
 
 export default TodoItem;
-
