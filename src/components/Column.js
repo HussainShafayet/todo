@@ -47,9 +47,7 @@ const Column = ({ id: columnId, title, todos }) => {
       )}
 
       {/* Todo list container */}
-      <div className="flex flex-col gap-2 mb-4 overflow-y-auto"  style={{
-    maxHeight: 'calc(90vh - 150px)'
-  }}>
+      <div className="flex flex-col gap-2 mb-4">
         {isNewColumn && showAddTodoForm && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
