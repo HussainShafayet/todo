@@ -1,5 +1,15 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { FaAlignLeft, FaPaperclip, FaHashtag, FaTrash } from "react-icons/fa";
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+} from "react";
+import {
+  FaAlignLeft,
+  FaPaperclip,
+  FaHashtag,
+  FaTrash,
+} from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useTodo } from "../context/TodoContext";
@@ -15,172 +25,188 @@ const TodoItem = ({ todo }) => {
   const { id, title, description, status, attachments, tags, dueDate } = todo;
 
   const [showMenu, setShowMenu] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(
-    dueDate ? new Date(dueDate) : new Date()
-  );
+  const [selectedDate, setSelectedDate] = useState(dueDate ? new Date(dueDate) : new Date());
   const menuRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // State for editing
+  // Editing states
   const [isEditing, setIsEditing] = useState(false);
-  const [editTitle, setEditTitle] = useState(todo.title);
-  const [editDescription, setEditDescription] = useState(todo.description);
+  const [editTitle, setEditTitle] = useState(title);
+  const [editDescription, setEditDescription] = useState(description);
 
-  const { attributes, listeners, setNodeRef } = useDraggable({ id: todo.id });
+  const { attributes, listeners, setNodeRef } = useDraggable({ id });
 
+  // Alert if task is overdue
   useEffect(() => {
     if (status === "Ongoing" && dueDate && new Date(dueDate) < new Date()) {
       alert(`⚠️ Task "${title}" is overdue!`);
     }
   }, [status, dueDate, title]);
 
-  const toggleMenu = useCallback((e) => {
-    e.preventDefault();
-    setShowMenu((prev) => !prev);
-  }, []);
+  // Toggle context menu
+  const toggleMenu = useCallback(
+    (e) => {
+      e.preventDefault();
+      setShowMenu((prev) => !prev);
+    },
+    []
+  );
 
-  const handleClickOutside = useCallback((e) => {
-    if (menuRef.current && !menuRef.current.contains(e.target)) {
-      setShowMenu(false);
-    }
-  }, []);
+  // Close menu on outside click
+  const handleClickOutside = useCallback(
+    (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowMenu(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (showMenu) {
       document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
   }, [showMenu, handleClickOutside]);
 
+  // Handle status changes
   const handleStatusChange = useCallback(
     (newStatus) => {
-      const updatedDate = newStatus === "Ongoing" ? selectedDate : null;
-      moveTodo(id, newStatus, updatedDate);
+      const updatedDueDate = newStatus === "Ongoing" ? selectedDate : null;
+      moveTodo(id, newStatus, updatedDueDate);
       setShowMenu(false);
     },
     [id, moveTodo, selectedDate]
   );
 
+  // Modal controls
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
   const handleConfirmDelete = () => {
-    removeTodo(todo.id);
+    removeTodo(id);
     closeModal();
   };
 
   return (
-   <motion.div
-  ref={setNodeRef}
-  onContextMenu={toggleMenu}
-  className={`relative p-4 pb-12 mb-2 border-l-4 rounded-lg shadow-md transition-colors duration-300 
-    bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 
-    ${getStatusColor(status)}`}
-  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-  animate={{ opacity: 1, scale: 1, y: 0 }}
-  exit={{ opacity: 0, scale: 0.95 }}
-  transition={{ duration: 0.3 }}
->
-  {isEditing ? (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        updateTodo(todo.id, { title: editTitle, description: editDescription });
-        setIsEditing(false);
-      }}
-      className="flex flex-col gap-2"
+    <motion.div
+      ref={setNodeRef}
+      onContextMenu={toggleMenu}
+      className={`relative p-4 pb-12 mb-2 border-l-4 rounded-lg shadow-md transition-colors duration-300
+        bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+        ${getStatusColor(status)}`}
+      initial={{ opacity: 0, scale: 0.95, y: -10 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.3 }}
     >
-      <input
-        value={editTitle}
-        onChange={(e) => setEditTitle(e.target.value)}
-        required
-        placeholder="Edit title"
-        className={`p-2 rounded border w-full focus:outline-none focus:ring-2 ${
-          theme === 'dark'
-            ? 'bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500'
-            : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-400'
-        }`}
-      />
-      <textarea
-        value={editDescription}
-        onChange={(e) => setEditDescription(e.target.value)}
-        placeholder="Edit description"
-        rows={3}
-        className={`p-2 rounded border w-full resize-none focus:outline-none focus:ring-2 ${
-          theme === 'dark'
-            ? 'bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500'
-            : 'bg-white border-gray-300 text-gray-900 focus:ring-blue-400'
-        }`}
-      />
-      <div className="flex gap-2 justify-end mt-2">
-        <button type="submit" className="btn-primary">Save</button>
-        <button type="button" onClick={() => setIsEditing(false)} className="btn-secondary">Cancel</button>
-      </div>
-    </form>
-  ) : (
-    <div {...listeners} {...attributes}>
-      <h2 className="text-lg font-semibold break-words">{title}</h2>
-      <p className="text-sm text-gray-600 dark:text-gray-300 break-words mt-1">{description}</p>
+      {isEditing ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            updateTodo(id, { title: editTitle, description: editDescription });
+            setIsEditing(false);
+          }}
+          className="flex flex-col gap-2"
+        >
+          <input
+            value={editTitle}
+            onChange={(e) => setEditTitle(e.target.value)}
+            required
+            placeholder="Edit title"
+            className={`p-2 rounded border w-full focus:outline-none focus:ring-2 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500"
+                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-400"
+            }`}
+          />
+          <textarea
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+            placeholder="Edit description"
+            rows={3}
+            className={`p-2 rounded border w-full resize-none focus:outline-none focus:ring-2 ${
+              theme === "dark"
+                ? "bg-gray-700 border-gray-600 text-gray-200 focus:ring-blue-500"
+                : "bg-white border-gray-300 text-gray-900 focus:ring-blue-400"
+            }`}
+          />
+          <div className="flex gap-2 justify-end mt-2">
+            <button type="submit" className="btn-primary">
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="btn-secondary"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div {...listeners} {...attributes}>
+          <h2 className="text-lg font-semibold break-words">{title}</h2>
+          <p className="text-sm text-gray-600 dark:text-gray-300 break-words mt-1">
+            {description}
+          </p>
 
-      <div className="flex items-center mt-2 text-gray-500 dark:text-gray-400 text-xs gap-2">
-        <FaAlignLeft />
-        <FaPaperclip />
-        <span>{attachments}</span>
-        <FaHashtag />
-        <span>{tags}</span>
-      </div>
+          <div className="flex items-center mt-2 text-gray-500 dark:text-gray-400 text-xs gap-2">
+            <FaAlignLeft />
+            <FaPaperclip />
+            <span>{attachments}</span>
+            <FaHashtag />
+            <span>{tags}</span>
+          </div>
 
-      {status === 'Ongoing' && dueDate && (
-        <p className="text-xs text-red-500 mt-1">
-          Due by: {new Date(dueDate).toLocaleDateString()}
-        </p>
+          {status === "Ongoing" && dueDate && (
+            <p className="text-xs text-red-500 mt-1">
+              Due by: {new Date(dueDate).toLocaleDateString()}
+            </p>
+          )}
+        </div>
       )}
-    </div>
-  )}
 
-  {/* Floating buttons in bottom right */}
-  <div className="absolute bottom-2 right-2 flex gap-2">
-    <button
-      onClick={() => setIsEditing(true)}
-      className="text-blue-500 hover:text-blue-700"
-      aria-label={`Edit todo: ${todo.title}`}
-      title="Edit"
-    >
-      ✏️
-    </button>
-    <button
-      onClick={openModal}
-      className="text-red-500 hover:text-red-700"
-      aria-label={`Delete todo: ${todo.title}`}
-      title="Delete"
-    >
-      <FaTrash />
-    </button>
-  </div>
+      {/* Floating action buttons */}
+      <div className="absolute bottom-2 right-2 flex gap-2">
+        <button
+          onClick={() => setIsEditing(true)}
+          className="text-blue-500 hover:text-blue-700"
+          aria-label={`Edit todo: ${title}`}
+          title="Edit"
+        >
+          ✏️
+        </button>
+        <button
+          onClick={openModal}
+          className="text-red-500 hover:text-red-700"
+          aria-label={`Delete todo: ${title}`}
+          title="Delete"
+        >
+          <FaTrash />
+        </button>
+      </div>
 
-  {/* Modals & Menus */}
-  <ConfirmModal
-    isOpen={isModalOpen}
-    title="Confirm Delete"
-    message={`Are you sure you want to delete "${todo.title}"?`}
-    onConfirm={handleConfirmDelete}
-    onCancel={closeModal}
-  />
-  {showMenu && (
-    <ContextMenu
-      ref={menuRef}
-      currentStatus={status}
-      selectedDate={selectedDate}
-      onDateChange={setSelectedDate}
-      onSelectStatus={handleStatusChange}
-    />
-  )}
-</motion.div>
+      {/* Confirmation modal for deletion */}
+      <ConfirmModal
+        isOpen={isModalOpen}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete "${title}"?`}
+        onConfirm={handleConfirmDelete}
+        onCancel={closeModal}
+      />
 
-
-
+      {/* Context menu */}
+      {showMenu && (
+        <ContextMenu
+          ref={menuRef}
+          currentStatus={status}
+          selectedDate={selectedDate}
+          onDateChange={setSelectedDate}
+          onSelectStatus={handleStatusChange}
+        />
+      )}
+    </motion.div>
   );
 };
 
@@ -191,8 +217,8 @@ const ContextMenu = React.forwardRef(
     return (
       <div
         ref={ref}
-        className="absolute top-10 left-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 
-        text-gray-800 dark:text-gray-100 rounded-lg shadow-lg z-10 p-4 w-52 transition-colors duration-300"
+        className="absolute top-10 left-0 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600
+          text-gray-800 dark:text-gray-100 rounded-lg shadow-lg z-10 p-4 w-52 transition-colors duration-300"
       >
         {options.includes("Ongoing") && (
           <div className="mb-4">
