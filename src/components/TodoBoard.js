@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTodo } from '../context/TodoContext';
-import { DndContext, DragOverlay } from '@dnd-kit/core';
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core';
 import { SearchBar, Column, TodoItem } from '.';
 
 const TodoBoard = () => {
@@ -32,7 +32,15 @@ const TodoBoard = () => {
   };
 
   return (
-    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}  sensors={useSensors(
+    useSensor(PointerSensor),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 5,
+      },
+    })
+  )}>
       <div
         className="flex flex-col items-center p-4 min-h-screen
                    bg-gray-100 text-gray-900
